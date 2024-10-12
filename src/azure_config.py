@@ -1,5 +1,9 @@
+import logging
 import os
 import re
+
+from dotenv import load_dotenv
+load_dotenv()
 
 class AzureConfig:
     """
@@ -101,7 +105,13 @@ class AzureConfig:
             self.aoai_account_name = self.get_domain_prefix(self.aoai_endpoint)
             self.search_account_name = self.get_domain_prefix(self.search_endpoint)
 
-
+    def get_env_var(self, var_name):
+        """Retrieve environment variable and log if it's not set."""
+        value = os.getenv(var_name)
+        if value is None:
+            logging.info(f"Environment variable '{var_name}' is not set.")
+        return value
+    
     def get_domain_prefix(self, url):
         match = re.search(r'https?://([^.]+)', url)
         if match:
