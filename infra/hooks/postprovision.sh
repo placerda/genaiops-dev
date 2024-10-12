@@ -42,8 +42,8 @@ function check_azd_env {
 # Check Python version
 echo "🐍 | Checking Python version..."
 PYTHON_VERSION=$(python -V 2>&1 | grep -oP "\d+\.\d+")
-if [[ "$PYTHON_VERSION" != "3.10" && "$PYTHON_VERSION" != "3.11" ]]; then
-    error_exit "Python 3.10 or 3.11 is required. Current version: $PYTHON_VERSION"
+if [[ "$PYTHON_VERSION" != "3.8" && "$PYTHON_VERSION" != "3.9" && "$PYTHON_VERSION" != "3.10" && "$PYTHON_VERSION" != "3.11" ]]; then
+    error_exit "Python 3.8, 3.9, 3.10 or 3.11 is required. Current version: $PYTHON_VERSION"
 else
     echo "✅ | Python version $PYTHON_VERSION detected."
 fi
