@@ -126,6 +126,7 @@ jobs:
         run: |
           echo "Run AI-Based prompt evaluation"
           export AZURE_OPENAI_API_KEY=$(az cognitiveservices account keys list --resource-group ${AZURE_RESOURCE_GROUP} --name ${AZURE_OPENAI_NAME} --query "key1" --output tsv)
+          export PYTHONPATH=./src:$PYTHONPATH
           python evaluations/prompty_eval.py
         shell: bash
 

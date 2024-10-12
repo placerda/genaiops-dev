@@ -133,7 +133,7 @@ runs:
           else
             resource_group_exist=$(az group exists --name "$AZURE_RESOURCE_GROUP")  
           fi        
-          echo "🔶 | Resource group ${AZURE_RESOURCE_GROUP:-'-'} exist status: $resource_group_exist"
+          echo "🔶 | Resource group ${AZURE_RESOURCE_GROUP:-'Undefined'} exist status: $resource_group_exist"
 
           # Previous deployment exists but the resource group doesn't. 
           # This situation occurs if you made a deployment and then deleted the resource group.
