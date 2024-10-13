@@ -156,8 +156,9 @@ runs:
 
           echo "${{ inputs.AZURE_ENV_NAME }} environment variables values." 
           
-          # Set environment variables and update AZD variables 
-          
+          # Set environment variables
+          echo "🔶 | Set environment variables."
+
           for VAR in "${VARIABLES[@]}"; do
               # Retrieve value from Azure environment
               VALUE_OUTPUT=$(azd env get-values -e "$AZURE_ENV_NAME" | grep $VAR | cut -d'=' -f2 | tr -d '"' || true)
@@ -177,11 +178,6 @@ runs:
                   SOURCE="Hard-coded"
               fi
 
-              # Update the Azure environment if needed
-              if [ -n "$VALUE" ] && [ "$VALUE" != "$VALUE_OUTPUT" ]; then
-                  echo "Updating $VAR in Azure environment..."
-                  azd env set $VAR $VALUE
-              fi
               # Export the variable to the current environment
               export $VAR=$VALUE
               echo "$VAR: $VALUE (from $SOURCE)"
@@ -189,32 +185,22 @@ runs:
 
           # Previous deployment exists. Update provisioned resources in case template has changed.
           if [  "$deployment_exists" = true ]; then
-            echo "🔶 | Previous deployment exists. Updating provisioned resources..."
+            echo "🔶 | Previous deployment exists. Updating provisioned resources in case template has changed..."
             azd provision --no-prompt
           fi
         fi
 
-        # Updating azd environment variables after provisioning
+        # Updating environment variables after provisioning
 
         for VAR in "${VARIABLES[@]}"; do
             # Retrieve value from Azure environment
             VALUE_OUTPUT=$(azd env get-values -e "$AZURE_ENV_NAME" | grep $VAR | cut -d'=' -f2 | tr -d '"' || true)
-            # Retrieve the current value in the GitHub environment
-            VALUE_GHAENV=$(eval echo \${$VAR})
-            # Determine which value to use (GitHub Actions env value or Azure env value)
-            if [ -n "$VALUE_GHAENV" ]; then
-                VALUE=$VALUE_GHAENV
-                SOURCE="GitHub Actions environment"
-            else
-                VALUE=$VALUE_OUTPUT
-                SOURCE="Azure environment"
-            fi
-
+            VALUE=$VALUE_OUTPUT
+            SOURCE="Azure environment"            
             if [ "$VAR" == "AZURE_PRINCIPAL_TYPE" ]; then
                 VALUE='ServicePrincipal'
                 SOURCE="Hard-coded"
             fi
-
             # Export the variable to the current environment
             export $VAR=$VALUE
             echo "$VAR: $VALUE (from $SOURCE)"

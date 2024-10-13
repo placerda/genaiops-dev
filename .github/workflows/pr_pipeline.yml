@@ -125,6 +125,22 @@ jobs:
           AZURE_OPENAI_API_VERSION: ${{needs.config-env-job.outputs.AZURE_OPENAI_API_VERSION}}    
         run: |
           echo "Run AI-Based prompt evaluation"
+          required_envs=(
+            "AZURE_RESOURCE_GROUP"
+            "AZURE_OPENAI_NAME"
+            "AZURE_OPENAI_ENDPOINT"
+            "AZURE_SEARCH_ENDPOINT"
+            "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
+            "AZURE_OPENAI_CHAT_DEPLOYMENT"
+            "AZURE_OPENAI_EMBEDDING_MODEL"
+            "AZURE_OPENAI_API_VERSION"
+          )
+          for env_var in "${required_envs[@]}"; do
+            if [ -z "${!env_var}" ]; then
+              echo "$env_var is needed but not set. Exiting."
+              exit 1
+            fi
+          done
           export AZURE_OPENAI_API_KEY=$(az cognitiveservices account keys list --resource-group ${AZURE_RESOURCE_GROUP} --name ${AZURE_OPENAI_NAME} --query "key1" --output tsv)
           export PYTHONPATH=./src:$PYTHONPATH
           python evaluations/prompty_eval.py
