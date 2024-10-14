@@ -204,6 +204,7 @@ runs:
             # Export the variable to the current environment
             export $VAR=$VALUE
             echo "$VAR: $VALUE (from $SOURCE)"
+            echo "${VAR}=${VALUE}" >> "$GITHUB_OUTPUT"
         done
 
         # Load sample data if needed
