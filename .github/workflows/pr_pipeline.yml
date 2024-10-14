@@ -122,7 +122,8 @@ jobs:
           AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_EMBEDDING_DEPLOYMENT}}
           AZURE_OPENAI_CHAT_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT}}
           AZURE_OPENAI_EMBEDDING_MODEL: ${{needs.config-env-job.outputs.AZURE_OPENAI_EMBEDDING_MODEL}}
-          AZURE_OPENAI_API_VERSION: ${{needs.config-env-job.outputs.AZURE_OPENAI_API_VERSION}}    
+          AZURE_OPENAI_API_VERSION: ${{needs.config-env-job.outputs.AZURE_OPENAI_API_VERSION}}  
+          AZUREAI_PROJECT_NAME: ${{needs.config-env-job.outputs.AZUREAI_PROJECT_NAME}}              
         run: |
           echo "Run AI-Based prompt evaluation"
           required_envs=(
@@ -134,6 +135,7 @@ jobs:
             "AZURE_OPENAI_CHAT_DEPLOYMENT"
             "AZURE_OPENAI_EMBEDDING_MODEL"
             "AZURE_OPENAI_API_VERSION"
+            "AZUREAI_PROJECT_NAME"
           )
           for env_var in "${required_envs[@]}"; do
             if [ -z "${!env_var}" ]; then
@@ -143,11 +145,6 @@ jobs:
           done
           export AZURE_OPENAI_API_KEY=$(az cognitiveservices account keys list --resource-group ${AZURE_RESOURCE_GROUP} --name ${AZURE_OPENAI_NAME} --query "key1" --output tsv)
           export PYTHONPATH=./src:$PYTHONPATH
-
-          # Write to .env file
-          echo "AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}" >> .env
-          echo "AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}" >> .env
-
           python evaluations/prompty_eval.py
         shell: bash
 

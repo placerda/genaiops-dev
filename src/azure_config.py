@@ -1,4 +1,3 @@
-import logging
 import os
 import re
 
@@ -47,15 +46,7 @@ class AzureConfig:
         self.subscription_id = self.get_env_var("AZURE_SUBSCRIPTION_ID")
         self.resource_group = self.get_env_var("AZURE_RESOURCE_GROUP")
         self.workspace_name = self.get_env_var("AZUREAI_PROJECT_NAME")
-
-        # Load optional environment variables with fallback to None if not set
-        self.location = os.getenv("AZURE_LOCATION")
-        self.aoai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-        self.aoai_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-        self.search_endpoint = os.getenv("AZURE_SEARCH_ENDPOINT")
-
-        # Set a default value for Azure OpenAI API key
-        self.aoai_api_key = "use_managed_identity"
+        self.check_missing_vars()
 
         # If essential variables are provided, initialize Azure clients
         if self.subscription_id and self.resource_group and self.workspace_name:
@@ -109,9 +100,25 @@ class AzureConfig:
         """Retrieve environment variable and log if it's not set."""
         value = os.getenv(var_name)
         if value is None:
-            logging.info(f"Environment variable '{var_name}' is not set.")
+            print(f"Environment variable '{var_name}' is not set.")
         return value
     
+    def check_missing_vars(self):
+        """Checks if essential environment variables are missing and exits if necessary."""
+        missing_vars = [
+            var for var in [
+                "AZURE_SUBSCRIPTION_ID", 
+                "AZURE_RESOURCE_GROUP", 
+                "AZUREAI_PROJECT_NAME"
+            ] if not os.getenv(var)
+        ]
+        if missing_vars:
+            print(
+                f"Error: The following environment variables are required but not set: "
+                f"{', '.join(missing_vars)}", 
+            )
+            exit(0) 
+
     def get_domain_prefix(self, url):
         match = re.search(r'https?://([^.]+)', url)
         if match:
