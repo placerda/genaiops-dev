@@ -10,7 +10,10 @@ def main():
     # Set the required environment variables
     azure_config = AzureConfig()
     os.environ['AZURE_OPENAI_ENDPOINT'] = azure_config.aoai_endpoint
-    os.environ['AZURE_OPENAI_API_KEY'] = azure_config.aoai_api_key    
+    os.environ['AZURE_OPENAI_API_KEY'] = azure_config.aoai_api_key
+
+    print("AZURE_OPENAI_ENDPOINT:", azure_config.aoai_endpoint)
+    print(f"AZURE_OPENAI_API_KEY: {azure_config.aoai_api_key[:5]}****")
 
     flow = "./src/chat.prompty"  # path to the prompty file
     data = "./evaluations/test-dataset.jsonl"  # path to the data file
