@@ -117,7 +117,7 @@ class AzureConfig:
                 f"Error: The following environment variables are required but not set: "
                 f"{', '.join(missing_vars)}", 
             )
-            exit(0) 
+            exit(1) 
 
     def get_domain_prefix(self, url):
         match = re.search(r'https?://([^.]+)', url)
