@@ -54,6 +54,7 @@ jobs:
       AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ steps.config-env.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT }}
       AZURE_OPENAI_EMBEDDING_MODEL: ${{ steps.config-env.outputs.AZURE_OPENAI_EMBEDDING_MODEL }}
       AZURE_OPENAI_API_VERSION: ${{ steps.config-env.outputs.AZURE_OPENAI_API_VERSION }}
+      AZUREAI_PROJECT_NAME: ${{ steps.config-env.outputs.AZUREAI_PROJECT_NAME }} 
     steps: 
       - uses: actions/checkout@v4
       - name: Get environment variables
@@ -139,7 +140,7 @@ jobs:
           )
           for env_var in "${required_envs[@]}"; do
             if [ -z "${!env_var}" ]; then
-              echo "$env_var is needed but not set. Exiting."
+              echo Env variable "$env_var is needed but not set. Exiting."
               exit 1
             fi
           done
