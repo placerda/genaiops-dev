@@ -143,6 +143,11 @@ jobs:
           done
           export AZURE_OPENAI_API_KEY=$(az cognitiveservices account keys list --resource-group ${AZURE_RESOURCE_GROUP} --name ${AZURE_OPENAI_NAME} --query "key1" --output tsv)
           export PYTHONPATH=./src:$PYTHONPATH
+
+          # Write to .env file
+          echo "AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}" >> .env
+          echo "AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}" >> .env
+
           python evaluations/prompty_eval.py
         shell: bash
 
