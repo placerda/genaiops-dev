@@ -47,6 +47,8 @@ jobs:
     needs: [unit-testing, static-code-analysis]
     outputs:
       AZURE_RESOURCE_GROUP: ${{ steps.config-env.outputs.AZURE_RESOURCE_GROUP }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       AZURE_OPENAI_NAME: ${{ steps.config-env.outputs.AZURE_OPENAI_NAME }}
       AZURE_OPENAI_ENDPOINT: ${{ steps.config-env.outputs.AZURE_OPENAI_ENDPOINT }}    
       AZURE_SEARCH_ENDPOINT: ${{ steps.config-env.outputs.AZURE_SEARCH_ENDPOINT }}
@@ -113,11 +115,12 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}           
-
       - name: AI-Based prompt evaluation
         env: 
           AZURE_RESOURCE_GROUP: ${{needs.config-env-job.outputs.AZURE_RESOURCE_GROUP}}
           AZURE_OPENAI_NAME: ${{needs.config-env-job.outputs.AZURE_OPENAI_NAME}}
+          AZURE_SUBSCRIPTION_ID: ${{needs.config-env-job.outputs.AZURE_SUBSCRIPTION_ID}} 
+          AZURE_LOCATION: ${{needs.config-env-job.outputs.AZURE_LOCATION}}                    
           AZURE_OPENAI_ENDPOINT: ${{needs.config-env-job.outputs.AZURE_OPENAI_ENDPOINT}}
           AZURE_SEARCH_ENDPOINT: ${{needs.config-env-job.outputs.AZURE_SEARCH_ENDPOINT}}
           AZURE_OPENAI_EMBEDDING_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_EMBEDDING_DEPLOYMENT}}
@@ -128,6 +131,8 @@ jobs:
         run: |
           echo "Run AI-Based prompt evaluation"
           required_envs=(
+            "AZURE_SUBSCRIPTION_ID"
+            "AZURE_LOCATION"            
             "AZURE_RESOURCE_GROUP"
             "AZURE_OPENAI_NAME"
             "AZURE_OPENAI_ENDPOINT"
