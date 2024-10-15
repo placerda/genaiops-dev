@@ -92,10 +92,10 @@ jobs:
         env:
           PYTHONPATH: src
           PYTHONWARNINGS: ignore::DeprecationWarning,ignore::RemovedInMarshmallow4Warning
-          AZURE_RESOURCE_GROUP: ${{needs.config-env-job.outputs.AZURE_RESOURCE_GROUP}}
-          AZURE_SUBSCRIPTION_ID: ${{needs.config-env-job.outputs.AZURE_SUBSCRIPTION_ID}} 
-          AZUREAI_PROJECT_NAME: ${{needs.config-env-job.outputs.AZUREAI_PROJECT_NAME}}
-          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT}}
+          AZURE_RESOURCE_GROUP: ${{needs.setup-env-job.outputs.AZURE_RESOURCE_GROUP}}
+          AZURE_SUBSCRIPTION_ID: ${{needs.setup-env-job.outputs.AZURE_SUBSCRIPTION_ID}} 
+          AZUREAI_PROJECT_NAME: ${{needs.setup-env-job.outputs.AZUREAI_PROJECT_NAME}}
+          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{needs.setup-env-job.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT}}
         run: pytest tests/ --doctest-modules --junitxml=junit/test-results-3.11.xml
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
