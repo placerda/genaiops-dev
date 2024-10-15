@@ -10,49 +10,8 @@ on:
       - develop
 
 jobs:
-
-  unit-testing:
-    if: ${{ github.repository != 'Azure/GenAIOps-project-template' }}    
-    runs-on: ubuntu-latest
-    environment: dev
-    steps:       
-      - uses: actions/checkout@v4
-      - name: Setup Python 
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-          pip install -r requirements.txt
-      - name: Test with pytest
-        env:
-          PYTHONPATH: src
-          PYTHONWARNINGS: ignore::DeprecationWarning,ignore::RemovedInMarshmallow4Warning
-          AZURE_RESOURCE_GROUP: ${{needs.config-env-job.outputs.AZURE_RESOURCE_GROUP}}
-          AZURE_SUBSCRIPTION_ID: ${{needs.config-env-job.outputs.AZURE_SUBSCRIPTION_ID}} 
-          AZUREAI_PROJECT_NAME: ${{needs.config-env-job.outputs.AZUREAI_PROJECT_NAME}}
-          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT}}
-        run: pytest tests/ --doctest-modules --junitxml=junit/test-results-3.11.xml
-      - name: Upload pytest test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-results-3.11
-          path: junit/test-results-3.11.xml
-        if: always()
-
-  code-standard-check: 
-    runs-on: ubuntu-latest
-    environment: dev
-    steps:
-      - name: Check code standards
-        run: |
-          echo "Run Pylint"
-
   setup-env-job:
     if: ${{ github.repository != 'Azure/GenAIOps-project-template' }}
-    needs: [unit-testing, code-standard-check]        
     runs-on: ubuntu-latest
     environment: dev
     outputs:
@@ -79,7 +38,6 @@ jobs:
       AZURE_STORAGE_ACCOUNT_NAME: ${{ steps.config-env.outputs.AZURE_STORAGE_ACCOUNT_NAME }}  
     steps: 
     - uses: actions/checkout@v4
-
     - name: Config dev environment
       uses: ./.github/actions/config-env
       id: config-env
@@ -113,6 +71,47 @@ jobs:
         AZURE_KEY_VAULT_NAME: ${{ vars.AZURE_KEY_VAULT_NAME }}
         AZURE_LOG_ANALYTICS_NAME: ${{ vars.AZURE_LOG_ANALYTICS_NAME }}
         AZURE_STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+
+  unit-testing:
+    if: ${{ github.repository != 'Azure/GenAIOps-project-template' }}    
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-env-job]        
+    steps:       
+      - uses: actions/checkout@v4
+      - name: Setup Python 
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -r requirements.txt
+      - name: Test with pytest
+        env:
+          PYTHONPATH: src
+          PYTHONWARNINGS: ignore::DeprecationWarning,ignore::RemovedInMarshmallow4Warning
+          AZURE_RESOURCE_GROUP: ${{needs.config-env-job.outputs.AZURE_RESOURCE_GROUP}}
+          AZURE_SUBSCRIPTION_ID: ${{needs.config-env-job.outputs.AZURE_SUBSCRIPTION_ID}} 
+          AZUREAI_PROJECT_NAME: ${{needs.config-env-job.outputs.AZUREAI_PROJECT_NAME}}
+          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{needs.config-env-job.outputs.AZURE_OPENAI_CHAT_DEPLOYMENT}}
+        run: pytest tests/ --doctest-modules --junitxml=junit/test-results-3.11.xml
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results-3.11
+          path: junit/test-results-3.11.xml
+        if: always()
+
+  code-standard-check: 
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-env-job]      
+    steps:
+      - name: Check code standards
+        run: |
+          echo "Run Pylint"
 
   flow-evaluation:
     needs: [setup-env-job, unit-testing, code-standard-check]
